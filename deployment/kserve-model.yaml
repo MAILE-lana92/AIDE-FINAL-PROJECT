@@ -1,0 +1,15 @@
+apiVersion: "serving.kserve.io/v1beta1"
+kind: "InferenceService"
+metadata:
+  name: "sentiment-model"
+  namespace: default
+spec:
+  predictor:
+    # Đây là cấu hình Scale to 0
+    minReplicas: 0 
+    maxReplicas: 3
+    model:
+      modelFormat:
+        name: mlflow
+      # Đường dẫn này bạn lấy từ giao diện MLFlow UI (Artifact Location)
+      storageUri: "gs://aide_bucket_1/sentiment_model"
