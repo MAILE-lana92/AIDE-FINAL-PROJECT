@@ -5,20 +5,24 @@ metadata:
 spec:
   predictor:
     containers:
-      - name: kserve-container
-        # Thay đường dẫn chuẩn của Mai ở đây
-        image: us-central1-docker.pkg.dev/AIDE-FINAL-PROJECT/my-repo/sentiment-api:latest 
-        # Cấu hình cổng mà FastAPI của Mai đang lắng nghe (thường là 8000 hoặc 8080)
+      - name: sentiment-api
+      #kserve-container
+        image: us-central1-docker.pkg.dev/aide-final-project/my-repo/sentiment-api:951ef01c583c8ab967a26017519de35db70da69d
         ports:
-          - containerPort: 8000 
-            protocol: TCP
+          - containerPort: 8080 # ĐỔI TỪ 8000 THÀNH 8080 ĐỂ KHỚP VỚI LOG
+        readinessProbe:
+          tcpSocket:
+            port: 8080 # CŨNG ĐỔI THÀNH 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          failureThreshold: 10
         env:
           - name: STORAGE_URI
-            # value: "gs://[BUCKET_NAME]/model" # Nếu Mai để model trong container thì bỏ dòng này
+            value: "gs://aide_bucket_1/sentiment_model" # Nếu Mai để model trong container thì bỏ dòng này
         resources:
-          limits:
-            cpu: "1"
-            memory: "1Gi"
           requests:
-            cpu: "500m"
-            memory: "512Mi"
+            cpu: "10m"      # Chỉ xin 1/100 nhân CPU (cực nhỏ)
+            memory: "256Mi" # Chỉ xin 256MB RAM để khởi động
+          limits:
+            cpu: "500m"     # Khi chạy có thể dùng tối đa 0.5 CPU
+            memory: "1Gi"   # Cho phép nở ra 1GB RAM để chứa model BERT 
